@@ -45,6 +45,18 @@ impl<T> BinaryHeap<T> {
             Some(item) => Some(item.data),
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.heap.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.heap.len()
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.heap.capacity()
+    }
 }
 
 struct Wrapper<T> {
