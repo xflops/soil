@@ -17,17 +17,20 @@ use super::Cmp;
 
 use std::cmp::Ordering;
 use std::collections;
-use std::sync::Arc;
+use std::rc::Rc;
 
-pub struct BinaryHeap<T> {
-    cmp: Arc<dyn Cmp<T>>,
-    heap: collections::BinaryHeap<Wrapper<T>>,
+pub struct BinaryHeap<T, C> {
+    cmp: Rc<C>,
+    heap: collections::BinaryHeap<Wrapper<T, C>>,
 }
 
-impl<T> BinaryHeap<T> {
-    pub fn new(cmp: Arc<dyn Cmp<T>>) -> Self {
+impl<T, C> BinaryHeap<T, C>
+where
+    C: Cmp<T>,
+{
+    pub fn new(cmp: C) -> Self {
         BinaryHeap {
-            cmp,
+            cmp: Rc::new(cmp),
             heap: collections::BinaryHeap::new(),
         }
     }
@@ -59,62 +62,69 @@ impl<T> BinaryHeap<T> {
     }
 }
 
-struct Wrapper<T> {
-    cmp: Arc<dyn Cmp<T>>,
+#[derive(Clone)]
+struct Wrapper<T, C> {
+    cmp: Rc<C>,
     data: T,
 }
 
-impl<T> Cmp<T> for Wrapper<T> {
+impl<T, C> Cmp<T> for Wrapper<T, C>
+where
+    C: Cmp<T>,
+{
     fn cmp(&self, t1: &T, t2: &T) -> Ordering {
         self.cmp.cmp(t1, t2)
     }
 }
 
-impl<T> Ord for Wrapper<T> {
+impl<T, C> Ord for Wrapper<T, C>
+where
+    C: Cmp<T>,
+{
     fn cmp(&self, other: &Self) -> Ordering {
         self.cmp.cmp(&self.data, &other.data)
     }
 }
 
-impl<T> Eq for Wrapper<T> {}
+impl<T, C> Eq for Wrapper<T, C> where C: Cmp<T> {}
 
-impl<T> PartialOrd for Wrapper<T> {
+impl<T, C> PartialOrd for Wrapper<T, C>
+where
+    C: Cmp<T>,
+{
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp.cmp(&self.data, &other.data))
+        Some(Cmp::cmp(self, &self.data, &other.data))
     }
 }
 
-impl<T> PartialEq for Wrapper<T> {
+impl<T, C> PartialEq for Wrapper<T, C>
+where
+    C: Cmp<T>,
+{
     fn eq(&self, other: &Self) -> bool {
         self.cmp.cmp(&self.data, &other.data) == Ordering::Equal
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        self.cmp.cmp(&self.data, &other.data) != Ordering::Equal
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    #[derive(Clone)]
     struct IntCmpR {}
 
     impl Cmp<i32> for IntCmpR {
         fn cmp(&self, t1: &i32, t2: &i32) -> Ordering {
-            if t1 == t2 {
-                Ordering::Equal
-            } else if t1 < t2 {
-                Ordering::Greater
-            } else {
-                Ordering::Less
+            match t1.cmp(t2) {
+                Ordering::Greater => Ordering::Less,
+                Ordering::Less => Ordering::Less,
+                Ordering::Equal => Ordering::Equal,
             }
         }
     }
 
     #[test]
     fn test_push() {
-        let mut head = BinaryHeap::new(Arc::new(IntCmpR {}));
+        let mut head = BinaryHeap::new(IntCmpR {});
         head.push(1);
         head.push(2);
 
