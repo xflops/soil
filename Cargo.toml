@@ -4,6 +4,6 @@ version = "0.1.3"
 edition = "2021"
 description = "An enhancement for Rust standard library"
 license-file = "LICENSE"
-repository = "https://github.com/xflops/soil"
+repository = "https://github.com/xflops/stdng"
 
 [dependencies]
