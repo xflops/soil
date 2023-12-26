@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn test_push() {
+    fn test_push_pop() {
         let mut head = BinaryHeap::new(IntCmpR {});
         head.push(1);
         head.push(2);
