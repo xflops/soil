@@ -116,7 +116,7 @@ mod tests {
         fn cmp(&self, t1: &i32, t2: &i32) -> Ordering {
             match t1.cmp(t2) {
                 Ordering::Greater => Ordering::Less,
-                Ordering::Less => Ordering::Less,
+                Ordering::Less => Ordering::Greater,
                 Ordering::Equal => Ordering::Equal,
             }
         }

@@ -4,4 +4,4 @@ version = 3
 
 [[package]]
 name = "stdng"
-version = "0.1.3"
+version = "0.1.5"
