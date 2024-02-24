@@ -7,3 +7,5 @@ license-file = "LICENSE"
 repository = "https://github.com/xflops/stdng"
 
 [dependencies]
+
+tracing = "*"
