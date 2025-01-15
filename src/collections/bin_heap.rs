@@ -17,10 +17,10 @@ use super::Cmp;
 
 use std::cmp::Ordering;
 use std::collections;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct BinaryHeap<T, C> {
-    cmp: Rc<C>,
+    cmp: Arc<C>,
     heap: collections::BinaryHeap<Wrapper<T, C>>,
 }
 
@@ -30,7 +30,7 @@ where
 {
     pub fn new(cmp: C) -> Self {
         BinaryHeap {
-            cmp: Rc::new(cmp),
+            cmp: Arc::new(cmp),
             heap: collections::BinaryHeap::new(),
         }
     }
@@ -64,7 +64,7 @@ where
 
 #[derive(Clone)]
 struct Wrapper<T, C> {
-    cmp: Rc<C>,
+    cmp: Arc<C>,
     data: T,
 }
 
